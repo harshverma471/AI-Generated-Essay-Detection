@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essay Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            color: #fff;
+        }
+        .container {
+            width: 80%;
+            margin: 100px auto;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        #essay {
+            width: calc(100% - 40px); /* Adjusted width */
+            height: 150px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #333;
+            color: #fff;
+            margin-right: 20px;
+            float: left;
+        }
+        .button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .loading-spinner {
+            display: none;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #output {
+            display: none;
+            margin-top: 20px;
+            text-align: left; /* Align text to left */
+            clear: both; /* Clear floating */
+            background-color: #444; /* Background color */
+            padding: 10px; /* Padding */
+            border-radius: 5px; /* Rounded corners */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Essay Detector <span style="font-size: 20px;">🔍</span></h1> <!-- Heading with magnifying glass emoji -->
+        <textarea id="essay" name="essay" rows="10" placeholder="Enter your essay here..." spellcheck="false"></textarea>
+        <button id="predictBtn" class="button">Predict</button>
+        <div id="loadingSpinner" class="loading-spinner"></div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        document.getElementById('predictBtn').addEventListener('click', function() {
+            var essay = document.getElementById('essay').value;
+            if (essay.trim() === '') {
+                alert('Please enter an essay.');
+                return;
+            }
+            // Clear previous result
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('output').style.display = 'none';
+            document.getElementById('predictBtn').style.display = 'none';
+            document.getElementById('loadingSpinner').style.display = 'block';
+            setTimeout(function() {
+                // Simulate processing time
+                document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('predictBtn').style.display = 'block';
+                // Make AJAX request to Flask app for prediction
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        if (xhr.status == 200) {
+                            document.getElementById('output').innerHTML = xhr.responseText;
+                            document.getElementById('output').style.display = 'block';
+                        } else {
+                            alert('Error: ' + xhr.statusText);
+                        }
+                    }
+                };
+                xhr.open('GET', '/predict?essay=' + encodeURIComponent(essay), true);
+                xhr.send();
+            }, 2000); // Simulating 2 seconds of processing time
+        });
+    </script>
+</body>
+</html>
